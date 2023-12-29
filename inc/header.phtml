@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Alexandre LAMOUREUX">
-    <title><?php $titre ?></title>
+    <title><?php Config::TITLE ?></title>
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap theme -->
@@ -36,7 +36,7 @@
     <!-- Fixed navbar -->
     <nav class="navbar navbar-inverse">
       <div class="container">
-          <a class="navbar-brand" href="vote.php"><i class='glyphicon glyphicon-sunglasses'></i><?= $titre ?></a>
+          <a class="navbar-brand" href="vote.php"><i class='<?= Config::TITLE_ICON ?>'></i> <?= Config::TITLE ?></a>
       </div>
     </nav>
 

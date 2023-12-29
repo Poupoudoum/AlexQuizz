@@ -7,7 +7,7 @@ ini_set('session.use_trans_sid', '0');
 ini_set('url_rewriter.tags', '');
 session_start();
 //avant tout, si magiQuotes n'est pas activé, on fait comme si ca l'etait!!!
-if (!get_magic_quotes_gpc()) {
+if (!function_exists("get_magic_quotes_gpc") || !get_magic_quotes_gpc()) {
    function addslashes_deep($value)
    {
        $value = is_array($value) ?
@@ -23,14 +23,8 @@ if (!get_magic_quotes_gpc()) {
 
 define("BP", dirname(__DIR__));
 
+include BP.'/inc/Config.php';
 include BP.'/inc/functions.php';
 include BP.'/inc/Cache.php';
 
 $head = "";
-
-
-//CONFIG 
-$votes = array("film" => "Le Film", "acteur" => "Acteur(tice) pincipal(e)");
-$titre = "Blind Test Filmographique 2024";
-
-?>
