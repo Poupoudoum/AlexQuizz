@@ -1,8 +1,8 @@
 # AlexQuizz 
 
-### Un petit script pour organiser des patits Quizz / Blind tests entre amis
+### Un petit script pour organiser des petits Quizz / Blind tests entre amis
 
-## préparation 
+## Préparation 
 
 L'oganisateur créé les questions au format vidéo ou image/audo dans le dossier Q, un dossier par question.
 
