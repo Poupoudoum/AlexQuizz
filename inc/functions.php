@@ -38,6 +38,12 @@ function getQuestions() {
     return $questions;
 }
 
+function clearVotes() {
+    foreach (Config::$votes as $v => $t) {
+        Cache::save($v, array());
+    }
+}
+
 function technify($str) {
     $str = strtolower(remove_accents($str));
     $str = preg_replace('/[^0-9a-z_]/', "_", $str);

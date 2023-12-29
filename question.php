@@ -12,9 +12,8 @@ if (isset($_GET["add"])) {
 
 if (isset($_GET["q"])) {
     if ($question != $_GET["q"]) {
+        clearVotes();
         Cache::save('question', $_GET["q"]);
-        Cache::save('artistes', array());
-        Cache::save('titres', array());
     }
     header("location: question.php#novotes");
 }
@@ -104,7 +103,7 @@ if ($question) :
     </div>
 <?php endif; ?>
 <div id='votes'>
-    <?php foreach ($votes as $v => $t) : ?>
+    <?php foreach (Config::$votes as $v => $t) : ?>
     <div class='col-xs-3'>
         <div class="panel panel-default" style='overflow: hidden;'>
             <div class="panel-heading"><?= ucfirst($t) ?></div>

@@ -28,8 +28,8 @@ if ($question) :
 ?>
 
 <h2 style='text-align: center;'>A toi de jouer <?= htmlentities($joueur) ?></h2>
-
-    <?php foreach ($votes as $v => $t) : ?>
+<h3 style='text-align: center;'>Question : <?= $question ?></h3>
+    <?php foreach (Config::$votes as $v => $t) : ?>
     <form class="form-horizontal" method='get'>
         <input type="hidden" name='vote' id="vote" value="<?= htmlentities($v) ?>">
         <label for="<?= $v ?>" class="control-label"><?= htmlentities($t) ?></label>

@@ -9,7 +9,7 @@ $data = array(
     "points" => Cache::get('points') ?? array(),
 );
 
-foreach ($votes as $v => $t) {
+foreach (Config::$votes as $v => $t) {
     $data[$v] = Cache::get($v) ?? array();
 }
 
