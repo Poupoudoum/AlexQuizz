@@ -107,7 +107,8 @@ if ($question) :
     <div class='col-xs-3'>
         <div class="panel panel-default" style='overflow: hidden;'>
             <div class="panel-heading"><?= ucfirst($t) ?></div>
-            <table class="table">
+            <div style='overflow: auto; max-height: 30vh;'>
+            <table class="table table-condensed">
                 <thead>
                     <tr>
                         <th>Joueur</th>
@@ -119,6 +120,7 @@ if ($question) :
                 <tbody id='votes_<?= $v ?>'>
                 </tbody>
             </table>
+            </div>
             <script>
                 setInterval(function() {
                     if ($('#refresh').is(':checked')) {
