@@ -1,0 +1,30 @@
+
+* {
+    max-width: 100%;
+}
+
+h1,h2,h3 {
+    text-align: center;
+}
+
+
+.navbar .container {
+    text-align: center;
+}
+
+.navbar-brand {
+    float:none;
+    display:inline-block;
+}
+
+.table.centered * {
+    text-align: center;
+}
+
+.vote {
+    visibility: hidden;
+}
+
+#votes:target .vote {
+    visibility: visible;
+}
