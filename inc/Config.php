@@ -10,6 +10,38 @@ class Config {
     CONST RESPONSE_OK_POINTS=5;
     CONST RESPONSE_BOF_POINTS=2;
     
+    //décrire les différentes questions/votes possibles ici
     public static $votes = array("film" => "Le Film", "acteur" => "Nom de famille de l'Acteur(tice) pincipal(e)");
+    
+    //mise en forme des scores
+    public static $positionsStyles = array(
+        array(
+            'class' => "success",
+            'icon' => "king",
+            'styles' => "",
+        ),
+        array(
+            'class' => "info",
+            'icon' => "queen",
+            'styles' => "",
+        ),
+        array(
+            'class' => "primary",
+            'icon' => "knight",
+            'styles' => "",
+        ),
+        array(
+            'class' => "warning",
+            'icon' => "bishop",
+            'styles' => "",
+        ),
+        array(
+            'class' => "danger",
+            'icon' => "pawn",
+            'styles' => "",
+        ),
+    );
+    
+    
     
 }

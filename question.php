@@ -187,34 +187,61 @@ if ($question) :
 
 
 <?php else : ?>
-<h1>RESULTATS ! </h1>
+<h1> <i class='glyphicon glyphicon glyphicon-stats'></i> RESULTATS : </h1>
 <?php endif ?>
 <br />
-<div class="panel panel-default panel-warning">
-    <div class="panel-heading">Scores</div>
+<?php 
+
+$maxScore = 1;
+$scores = array();
+foreach ($joueurs as $j => $joueur) {
+    $s = intval(getData('points', $j) ?? 0);
+    $scores[$j] = $s;
+    $maxScore = max($s, $maxScore);
+}
+asort($scores);
+$scores = array_reverse($scores);
+$i = 0;
+$lastScore = null;
+$lastScoreIndex = 0;
+
+?>
+<div class="panel panel-default panel-warning scores">
+    <div class="panel-heading"><i class='glyphicon glyphicon-sort-by-attributes-alt'></i> Scores</div>
     <table class="table centered">
         <thead>
             <tr>
-                <td>Joueur : </td>
-                <?php foreach ($joueurs as $j => $joueur) : ?>
-                    <th><?= htmlentities($joueur) ?></th>
-                <?php endforeach; ?>
+                <th>Joueur : </th>
+                <th>Score : </th>
             </tr>
         </thead>
-        <tr>
-            <td>Score : </td>
-            <?php foreach ($joueurs as $j => $joueur) : ?>
-                <td><?= htmlentities(getData('points', $j) ?? '0') ?></td>
-            <?php endforeach; ?>
-        </tr>
-        <?php if ($question != "RESULTS") : ?>
-<!--        <tr>
-            <td>Ajouter : </td>
-            <?php foreach ($joueurs as $j => $joueur) : ?>
-            <td><input type='number' id='add_<?= $j ?>' name='add[<?= $j ?>]' value='0'></td>
-            <?php endforeach; ?>
-        </tr>-->
-        <?php endif ?>
+        <?php foreach ($scores as $j => $s) : ?>
+            <?php 
+                // if score is the same as previous score, decrease i
+                if ($lastScore === $s) {
+                    $i = $lastScoreIndex;
+                }
+            ?>
+            <?php $style = Config::$positionsStyles[$i] ?>
+            <tr>
+                <th class='name' style='<?= $style['styles'] ?>'>
+                    <i class='glyphicon glyphicon-<?= $style['icon'] ?>'></i>&nbsp;<?= htmlentities($joueurs[$j]) ?>
+                </th>
+                <td><span class="score-value label label-<?= $style['class'] ?>"><?= htmlentities($s) ?></span></td>
+                <td class='histogram'>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-<?= $style['class'] ?>" role="progressbar" style="width: <?= round((($s)/($maxScore))*100) ?>%;">
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <?php 
+                $lastScore = $s;
+                $lastScoreIndex = $i;
+                // increase i
+                $i = min( $i+1, count(Config::$positionsStyles)-1 );
+            ?>
+        <?php endforeach; ?>
     </table>
 </div>
 <?php if ($question != "RESULTS") : ?>

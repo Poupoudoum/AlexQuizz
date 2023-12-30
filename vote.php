@@ -1,12 +1,14 @@
 <?php 
 include "inc/preheader.php";
 
-if (isset($_GET['nom'])) {
-    $_SESSION['nom'] = $_GET['nom'];
+if (isset($_GET['nom']) && strlen(trim($_GET['nom'])) >= 2 ) {
+    $_SESSION['nom'] = trim($_GET['nom']);
     header("location: vote.php");
+    exit;
 }
 if (!isset($_SESSION['nom'])) {
     header("location: index.php");
+    exit;
 }
 $joueur = $_SESSION['nom'];
 $j = technify($joueur);
@@ -19,6 +21,7 @@ if (isset($_GET['vote'])) {
         addData($_GET['vote'], $j, $_GET['val']);
     }
     header("location: vote.php");
+    exit;
 }
 
 
