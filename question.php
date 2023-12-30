@@ -6,7 +6,9 @@ $joueurs = Cache::get('joueurs') ?? array();
 
 if (isset($_GET["add"])) { 
     foreach ($joueurs as $j => $joueur) {
-        addData('points', $j, intval(getData('points', $j)) + ($_GET['add'][$j] ?? 0));
+        foreach (Config::$votes as $v => $t) {
+            addData('points', $j, intval(getData('points', $j)) + ($_GET['add'][$v][$j] ?? 0));
+        }
     }
 }
 
@@ -27,11 +29,20 @@ if (isset($_GET["v"])) {
     $vote = $_GET["v"];
     
     foreach (Cache::get($vote) ?? array() as $j => $v) { ?>
-    <tr>
+     <tr>
         <td><?= htmlentities(getData('joueurs', $j)) ?></td>
         <td class='vote'><?= htmlentities($v) ?></td>
-        <td class='vote'><a class='btn btn-sm btn-success' onclick="$('#add_<?= $j ?>').val(parseInt($('#add_<?= $j ?>').val()) + 5)">+5</a></td>
-        <td class='vote'><a class='btn btn-sm btn-info   ' onclick="$('#add_<?= $j ?>').val(parseInt($('#add_<?= $j ?>').val()) + 2)">+2</a></td>
+        <td class='points'>
+            <?php $iid = "points-$vote-$j-"; ?>
+            <input type='radio' id='<?= $iid ?>ok'  name='add[<?= $vote ?>][<?= $j ?>]' value='<?= Config::RESPONSE_OK_POINTS ?>'  />
+            <label for='<?= $iid ?>ok'>+<?= Config::RESPONSE_OK_POINTS  ?></label>
+            &nbsp;
+            <input type='radio' id='<?= $iid ?>bof' name='add[<?= $vote ?>][<?= $j ?>]' value='<?= Config::RESPONSE_BOF_POINTS ?>' />
+            <label for='<?= $iid ?>bof'>+<?= Config::RESPONSE_BOF_POINTS ?></label>
+            &nbsp;
+            <input type='radio' id='<?= $iid ?>ko'  name='add[<?= $vote ?>][<?= $j ?>]' value='0'  />
+            <label for='<?= $iid ?>ko'><i class='glyphicon glyphicon-thumbs-down'></i></label>
+        </td>
      </tr>
     <?php
     }
@@ -40,8 +51,15 @@ if (isset($_GET["v"])) {
 
 $questions = getQuestions();
 $nextQuestion = false;
+$questionIndex = 0;
+$questionsCount = count($questions);
 
 foreach ($questions as $q) {
+    if (strstr($q, "EXEMPLE") !== false) {
+        //si une question contient Exemple elle ne "compte pas"
+        $questionIndex--;
+        $questionsCount--;
+    }
     if ($nextQuestion === true) {
         $nextQuestion = $q;
         break;
@@ -49,6 +67,7 @@ foreach ($questions as $q) {
     if ($q === $question) {
         $nextQuestion = true;
     }
+    $questionIndex++;
 }
 if ($nextQuestion === false) {
     $nextQuestion = current($questions); //first
@@ -66,55 +85,80 @@ if ($question) :
     
     $videoMode = is_file("Q/$question/Q.mp4");
 ?>
-    <div style='text-align: right'>
-        <a href='#votes'>Voir les votes</a> 
-        <a href='#novotes'>Cacher les votes</a> 
-        <input type='checkbox' id='refresh' checked='checked'> <label for='refresh'>Rafraichir</label>
-    </div>
-<div class='clearfix'></div>
+<form method='GET' id='votes'>
+<div id='response'>
+    
+<div class='navbar-buttons'>
+    <a href='#votes' class="btn btn-info showvotes"><i class='glyphicon glyphicon-eye-open'></i></a> 
+    <a href='#novotes' class="btn btn-primary hidevotes"><i class='glyphicon glyphicon-eye-close'></i></a> 
+
+    <input type='checkbox' id='refresh' checked='checked'> 
+    <label for='refresh' class="btn btn-warning"><i class='glyphicon glyphicon-refresh'></i></label> 
+    <label for='refresh' class="btn btn-danger"><i class='glyphicon glyphicon-stop'></i></label> 
+</div>
+
+     
+<div class="col-xs-9 question-container">
 <?php if (!$videoMode) : ?>
-    <div class="col-xs-9">
-        <img src='Q/<?= $question ?>/Q.png' />
-        <figure>
-            <figcaption>Question <?= $question ?> :</figcaption>
-            <audio
-                autoplay
-                controls
-                src="Q/<?= $question ?>/Q.mp3">
-                    Your browser does not support the
-                    <code>audio</code> element.
-            </audio>
-        </figure>
-    </div>
+    <img src='Q/<?= $question ?>/Q.png' />
+    <figure>
+        <figcaption>
+                Question <?= $question ?> <small>( <?= $questionIndex ?> / <?= $questionsCount ?> )</small>
+        </figcaption>
+        <audio
+            autoplay
+            controls
+            src="Q/<?= $question ?>/Q.mp3">
+                Your browser does not support the
+                <code>audio</code> element.
+        </audio>
+    </figure>
 <?php else: ?>
-    <div class="col-xs-9">
-        <figure>
-            <figcaption><h2>Question <?= $question ?></h2></figcaption>
-            <video
-                id='player'
-                
-                autoplay
-                controls
-                src="Q/<?= $question ?>/Q.mp4">
-                    Your browser does not support the
-                    <code>audio</code> element.
-            </video>
-        </figure>
-    </div>
+    <figure>
+        <figcaption>
+            <h2>
+                Question <?= $question ?> <small>( <?= $questionIndex ?> / <?= $questionsCount ?> )</small>
+                <?php if (is_file("Q/$question/R.mp4")) :?>
+                    <a class="btn btn-info btn-indice" role="button" onclick='$("#player").attr("src", "Q/<?= $question ?>/R.mp4"); $(this).hide();'>
+                        Indice / Suite / Bonus <i class='glyphicon glyphicon-info-sign'></i>
+                    </a>
+                <?php endif; ?>
+            </h2>
+        </figcaption>
+        <video
+            id='player'
+
+            autoplay
+            controls
+            src="Q/<?= $question ?>/Q.mp4">
+                Your browser does not support the
+                <code>audio</code> element.
+        </video>
+    </figure>
 <?php endif; ?>
-<div id='votes'>
+
+<div class="well well-bg well-response">
+        <?php echo nl2br(@file_get_contents("Q/$question/A.txt")); ?>
+</div>
+<center>
+    <a class="btn btn-primary btn-response" href='#response' onclick="$('#refresh').prop('checked', false); ">
+        Réponse <i class='glyphicon glyphicon-share-alt'></i>
+    </a>
+</center>
+        
+</div>
+<div>
     <?php foreach (Config::$votes as $v => $t) : ?>
     <div class='col-xs-3'>
         <div class="panel panel-default" style='overflow: hidden;'>
             <div class="panel-heading"><?= ucfirst($t) ?></div>
-            <div style='overflow: auto; height: <?= round(70 / count(Config::$votes)) - 5 ?>vh;'>
+            <div style='overflow: auto; height: calc(<?= round(100 / count(Config::$votes)) ?>vh - 100px);'>
             <table class="table table-condensed">
                 <thead>
                     <tr>
                         <th>Joueur</th>
-                        <th>Vote</th>
-                        <th> </th>
-                        <th> </th>
+                        <th class='vote'>Vote</th>
+                        <th class='points'> </th>
                     </tr>
                 </thead>
                 <tbody id='votes_<?= $v ?>'>
@@ -131,33 +175,21 @@ if ($question) :
         </div>
     </div>
     <?php endforeach ?>
+    <script>
+        if (window.location.hash == "#response") {
+            setTimeout(function() {
+                $('#refresh').prop('checked', false);
+            }, 300);
+        }
+    </script>
 </div>
 <div class='clearfix'></div>
 
-<?php if ($videoMode && is_file("Q/$question/R.mp4")) :?>
-<center>
-    <a class="btn btn-info" role="button" onclick='$("#player").attr("src", "Q/<?= $question ?>/R.mp4"); $(this).hide();'>
-        Indice / Suite / Bonus
-    </a>
-</center>
-<?php endif; ?>
-<br>
-<div class="collapse" id="collapseExample">
-    <div class="well well-bg" style='font-size: 140%; text-align: center; max-width: 500px; margin: 20px auto;'>
-            <?php echo nl2br(@file_get_contents("Q/$question/A.txt")); ?>
-    </div>
-</div>
-<center>
-    <a class="btn btn-primary" role="button" onclick="$(this).hide();" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-        Réponse
-    </a>
-</center>
 
 <?php else : ?>
 <h1>RESULTATS ! </h1>
 <?php endif ?>
 <br />
-<form method='GET'>
 <div class="panel panel-default panel-warning">
     <div class="panel-heading">Scores</div>
     <table class="table centered">
@@ -176,21 +208,27 @@ if ($question) :
             <?php endforeach; ?>
         </tr>
         <?php if ($question != "RESULTS") : ?>
-        <tr>
+<!--        <tr>
             <td>Ajouter : </td>
             <?php foreach ($joueurs as $j => $joueur) : ?>
             <td><input type='number' id='add_<?= $j ?>' name='add[<?= $j ?>]' value='0'></td>
             <?php endforeach; ?>
-        </tr>
+        </tr>-->
         <?php endif ?>
     </table>
 </div>
 <?php if ($question != "RESULTS") : ?>
 <input type='hidden' name='q' value='<?= $nextQuestion ?>' />
-<button type="submit" style='float: right;' class='btn btn-sm btn-default'>Question suivante</button>
+<center>
+    <button type="submit" class='btn btn-success'>Question suivante ! <i class='glyphicon glyphicon-chevron-right'></i></button>
+</center>
+<br />
+<br >
+
 <?php else : ?>
-<h2>ET BONNE ANNEE 2024 !!!</h2>
+<h2><?= Config::CONCLUSION_MESSAGE ?></h2>
 <?php endif ?>
+</div>
 </form>
     
     
